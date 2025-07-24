@@ -563,15 +563,26 @@
             const progress = ((currentQuestionIndex + 1) / gameQuestions.length) * 100;
             document.getElementById('progressFill').style.width = progress + '%';
             
-            // Mostrar opciones
+            // Mezclar las opciones manteniendo el índice correcto
+            const optionsWithIndex = question.options.map((option, index) => ({
+                text: option,
+                originalIndex: index
+            }));
+            
+            const shuffledOptions = shuffleArray(optionsWithIndex);
+            
+            // Encontrar cuál es ahora la respuesta correcta
+            question.shuffledCorrect = shuffledOptions.findIndex(opt => opt.originalIndex === question.correct);
+            
+            // Mostrar opciones mezcladas
             const optionsContainer = document.getElementById('options');
             optionsContainer.innerHTML = '';
             
-            question.options.forEach((option, index) => {
+            shuffledOptions.forEach((optionObj, index) => {
                 const optionElement = document.createElement('div');
                 optionElement.className = 'option';
                 const letters = ['A', 'B', 'C', 'D'];
-                optionElement.innerHTML = `<strong>${letters[index]})</strong> ${option}`;
+                optionElement.innerHTML = `<strong>${letters[index]})</strong> ${optionObj.text}`;
                 optionElement.onclick = () => selectOption(index, optionElement);
                 optionsContainer.appendChild(optionElement);
             });
@@ -587,12 +598,12 @@
             
             selectedOption = optionIndex;
             const question = gameQuestions[currentQuestionIndex];
-            const isCorrect = optionIndex === question.correct;
+            const isCorrect = optionIndex === question.shuffledCorrect;
             
             // Mostrar todas las opciones con sus colores
             const options = document.querySelectorAll('.option');
             options.forEach((opt, idx) => {
-                if (idx === question.correct) {
+                if (idx === question.shuffledCorrect) {
                     opt.classList.add('correct');
                 } else if (idx === optionIndex && !isCorrect) {
                     opt.classList.add('incorrect');
@@ -661,4 +672,5 @@
         }
     </script>
 </body>
+</html>
 </html>
